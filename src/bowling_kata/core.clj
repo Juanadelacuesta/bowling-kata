@@ -1,7 +1,6 @@
 (ns bowling-kata.core
   (:gen-class)
-  (:require [clojure.string :as str])
-  (:require [clojure.java.io :as io] ))
+  (:require [clojure.string :as str]))
 
 (def input "| 1 4 | 4 5 | 6 / | 5 / | X | 0 1 | 7 / | 6 / | X | 2 / 6 |")
 
