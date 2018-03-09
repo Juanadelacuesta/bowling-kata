@@ -2,46 +2,46 @@
   (:gen-class)
   (:require [clojure.string :as str]))
 
-(def input "| 1 4 | 4 5 | 6 / | 5 / | X | 0 1 | 7 / | 6 / | X | 2 / 6 |")
-
-(defn clean [s]
-  (filter seq (str/split (str/replace s #"\s" "" )
-                         #"\|"
-                         -1)))
+(defn parse-game [s]
+  (filter seq (-> s
+                  (str/replace #"\s" "")
+                  (str/split #"\|"))))
 
 (defn strike? [frame]
   (some? (re-find #"^X" (str frame))))
 
-(defn split? [frame]
-  (some? (re-find #"^[0-9]+/" frame)))
+(defn spare? [throws]
+  (let [frame (str throws)] (or (some? (re-find #"^S" frame))
+                                (some? (re-find #"^[0-9]+/" frame)))))
+
+(defn throw-score [frame]
+  (cond (strike? frame)  10
+        (spare? frame)   10
+        :else            (Character/digit frame 10)))
 
 (defn add-throws [frame]
-  (reduce + (map #(if (strike? %)
-                    10
-                    (Character/digit % 10))
-                 frame)))
+  (reduce + 0 (map throw-score frame)))
 
-(defn get-throws-score [f1]
-  (add-throws (or (and (split? f1) (str/replace f1  #"^[0-9]+/" "X"))
-                  f1)))
+(defn get-throws-score [frame]
+  (add-throws (or (and (spare? frame)
+                       (str/replace frame  #"^[0-9]+/" "S"))
+                  frame)))
 
-(defn get-split-bonus
+(defn get-spare-bonus
   [[throw1 & _]]
   (get-throws-score (str throw1)))
 
 (defn get-strike-bonus
   [frame next-frame]
-  (let [sf (str frame next-frame)
-        f (str (first sf) (second sf))]
-    (get-throws-score f)))
+  (let [bonus-throws (apply str (take 2 (str frame next-frame)))]
+    (get-throws-score bonus-throws)))
 
 (defn get-frame-score
  [frame next-frame next-next-frame]
  (+ (get-throws-score frame)
-    (or (and (split? frame) (get-split-bonus next-frame))
+    (or (and (spare? frame) (get-spare-bonus next-frame))
         (and (strike? frame) (get-strike-bonus next-frame next-next-frame))
         0)))
-
 
 (defn add-scores
   ([scores]
@@ -53,6 +53,6 @@
 
 (defn -main
   "The bowling project reads a file with the score of a bowling match and returns the final score"
-  [& Args]
-  (let [[path & _ ] Args]
-    (println (add-scores (clean (slurp path))))))
+  [& args]
+  (let [[path & _ ] args]
+    (println (add-scores (parse-game (slurp path))))))

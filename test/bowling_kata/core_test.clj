@@ -4,10 +4,10 @@
 
 (deftest bowling-kata-test
   (testing "add-scores add the scores of an input"
-    (is (= 133 (add-scores (clean "| 1 4 | 4 5 | 6 / | 5 / | X | 0 1 | 7 / | 6 / | X | 2 / 6 |"))))
-    (is (= 300 (add-scores (clean "| X | X  | X | X | X | X | X | X | X | XXX |"))))
-    (is (= 242 (add-scores (clean "| X | 1 0 | 6 / | X | X | X | X | X | X | X X X |"))))
-    (is (= 20 (add-scores (clean "| 1 1 | 1 1 | 1 1 | 1 1 | 1 1| 1 1| 1 1| 1 1 | 1 1 | 1 1 |")))))
+    (is (= 133 (add-scores (parse-game "| 1 4 | 4 5 | 6 / | 5 / | X | 0 1 | 7 / | 6 / | X | 2 / 6 |"))))
+    (is (= 300 (add-scores (parse-game "| X | X  | X | X | X | X | X | X | X | XXX |"))))
+    (is (= 242 (add-scores (parse-game "| X | 1 0 | 6 / | X | X | X | X | X | X | X X X |"))))
+    (is (= 20 (add-scores (parse-game "| 1 1 | 1 1 | 1 1 | 1 1 | 1 1| 1 1| 1 1| 1 1 | 1 1 | 1 1 |")))))
 
   (testing "get-throws-score returns the scores of the frame's throws"
     (is (= 2 (get-throws-score "11")))
@@ -19,5 +19,6 @@
     (is (= 30 (get-frame-score "X" "X" "X")))
     (is (= 20 (get-frame-score "6/" "X" "11")))
     (is (= 11 (get-frame-score "6/" "11" "11")))
-    (is (= 11 (get-frame-score "6/" nil nil)))
-))
+    ;; the code is correct, but the test was failing as it expected
+    ;; the wrong value
+    (is (= 10 (get-frame-score "6/" nil nil)))))
